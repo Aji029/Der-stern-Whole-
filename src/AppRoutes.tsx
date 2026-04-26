@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
@@ -97,8 +98,8 @@ export function AppRoutes() {
         </PortalAuthProvider>
       } />
 
-      {/* Root Redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      {/* Landing page — choose Admin or Customer */}
+      <Route path="/" element={<LandingPage />} />
     </Routes>
   );
 }
