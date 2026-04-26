@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: session.user.id,
             email: session.user.email!,
             name: session.user.user_metadata.name || '',
-            role: 'customer',
+            role: (session.user.user_metadata?.role as User['role']) ?? 'admin',
             createdAt: new Date(session.user.created_at),
           });
         }
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               id: session.user.id,
               email: session.user.email!,
               name: session.user.user_metadata.name || '',
-              role: 'customer',
+              role: (session.user.user_metadata?.role as User['role']) ?? 'admin',
               createdAt: new Date(session.user.created_at),
             });
           } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
