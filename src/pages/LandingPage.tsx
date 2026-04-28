@@ -6,23 +6,35 @@ export function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #2e3c0a 0%, #3d5010 45%, #2e3c0a 100%)' }}>
+      {/* Watermark star */}
+      <div className="pointer-events-none fixed inset-0 flex items-center justify-center opacity-[0.04]">
+        <svg viewBox="0 0 100 100" className="w-[600px] h-[600px]">
+          <polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35"
+                   fill="#8cb918" />
+        </svg>
+      </div>
+
       {/* Header */}
-      <header className="flex items-center justify-center pt-12 pb-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-yellow-500 p-2.5 rounded-xl shadow-lg shadow-yellow-500/30">
-            <Star className="h-8 w-8 text-white" />
+      <header className="flex items-center justify-center pt-14 pb-6">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl"
+               style={{ background: '#8cb918' }}>
+            <Star className="h-8 w-8 text-white fill-white" />
           </div>
-          <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Der Stern</h1>
-            <p className="text-yellow-400 text-sm font-medium tracking-widest uppercase">Food Distribution</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-white/50 text-lg font-medium tracking-widest uppercase">Der</span>
+            <span className="text-white text-4xl font-extrabold tracking-wider uppercase">Stern</span>
           </div>
+          <p className="text-white/40 text-xs font-medium tracking-[0.2em] uppercase">
+            Vom Grossmarkt Berlin
+          </p>
         </div>
       </header>
 
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <p className="text-gray-400 text-lg mb-10 text-center">
+        <p className="text-white/50 text-base mb-10 text-center">
           Choose how you'd like to sign in
         </p>
 
@@ -30,33 +42,48 @@ export function LandingPage() {
           {/* Admin Card */}
           <button
             onClick={() => navigate('/login')}
-            className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-yellow-500/50 rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-xl hover:shadow-yellow-500/10 hover:-translate-y-1"
+            className="group relative rounded-2xl p-7 text-left transition-all duration-200 hover:-translate-y-1"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.10)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(140,185,24,0.12)';
+              e.currentTarget.style.border = '1px solid rgba(140,185,24,0.35)';
+              e.currentTarget.style.boxShadow = '0 10px 40px rgba(140,185,24,0.12)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              e.currentTarget.style.border = '1px solid rgba(255,255,255,0.10)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="bg-yellow-500/20 group-hover:bg-yellow-500/30 p-3 rounded-xl transition-colors">
-                <LayoutDashboard className="h-7 w-7 text-yellow-400" />
+            <div className="flex items-center justify-between mb-5">
+              <div className="p-3 rounded-xl" style={{ background: 'rgba(140,185,24,0.15)' }}>
+                <LayoutDashboard className="h-6 w-6" style={{ color: '#8cb918' }} />
               </div>
-              <ChevronRight className="h-5 w-5 text-gray-500 group-hover:text-yellow-400 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="h-5 w-5 text-white/30 group-hover:text-white/70 group-hover:translate-x-1 transition-all" />
             </div>
 
             <h2 className="text-xl font-bold text-white mb-1">Admin Dashboard</h2>
-            <p className="text-gray-400 text-sm mb-6">Manage orders, customers, products and reports</p>
+            <p className="text-white/40 text-sm mb-5">Manage orders, customers, products and reports</p>
 
             <div className="space-y-2">
               {[
-                { icon: ClipboardList, label: 'Orders & Fulfillment' },
-                { icon: Package, label: 'Products & Inventory' },
-                { icon: BarChart3, label: 'Reports & Analytics' },
+                { icon: ClipboardList, label: "Orders & Fulfillment" },
+                { icon: Package,       label: "Products & Inventory" },
+                { icon: BarChart3,     label: "Reports & Analytics" },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-xs text-gray-500">
-                  <Icon className="h-3.5 w-3.5 text-yellow-500/60" />
+                <div key={label} className="flex items-center gap-2 text-xs" style={{ color: 'rgba(140,185,24,0.55)' }}>
+                  <Icon className="h-3.5 w-3.5" />
                   {label}
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 pt-5 border-t border-white/10">
-              <span className="inline-flex items-center gap-2 text-sm font-semibold text-yellow-400 group-hover:gap-3 transition-all">
+            <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all"
+                    style={{ color: '#8cb918' }}>
                 Sign in as Admin
                 <ChevronRight className="h-4 w-4" />
               </span>
@@ -66,33 +93,48 @@ export function LandingPage() {
           {/* Customer Card */}
           <button
             onClick={() => navigate('/portal/login')}
-            className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/50 rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1"
+            className="group relative rounded-2xl p-7 text-left transition-all duration-200 hover:-translate-y-1"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.10)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(140,185,24,0.12)';
+              e.currentTarget.style.border = '1px solid rgba(140,185,24,0.35)';
+              e.currentTarget.style.boxShadow = '0 10px 40px rgba(140,185,24,0.12)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              e.currentTarget.style.border = '1px solid rgba(255,255,255,0.10)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="bg-blue-500/20 group-hover:bg-blue-500/30 p-3 rounded-xl transition-colors">
-                <ShoppingBag className="h-7 w-7 text-blue-400" />
+            <div className="flex items-center justify-between mb-5">
+              <div className="p-3 rounded-xl" style={{ background: 'rgba(140,185,24,0.15)' }}>
+                <ShoppingBag className="h-6 w-6" style={{ color: '#a3d420' }} />
               </div>
-              <ChevronRight className="h-5 w-5 text-gray-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="h-5 w-5 text-white/30 group-hover:text-white/70 group-hover:translate-x-1 transition-all" />
             </div>
 
             <h2 className="text-xl font-bold text-white mb-1">Customer Portal</h2>
-            <p className="text-gray-400 text-sm mb-6">Browse your products and place orders online</p>
+            <p className="text-white/40 text-sm mb-5">Browse your products and place orders online</p>
 
             <div className="space-y-2">
               {[
-                { icon: Package, label: 'Browse Your Products' },
-                { icon: ShoppingBag, label: 'Place Orders Easily' },
-                { icon: ClipboardList, label: 'Track Order Status' },
+                { icon: Package,       label: "Browse Your Products" },
+                { icon: ShoppingBag,   label: "Place Orders Easily" },
+                { icon: ClipboardList, label: "Track Order Status" },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-xs text-gray-500">
-                  <Icon className="h-3.5 w-3.5 text-blue-500/60" />
+                <div key={label} className="flex items-center gap-2 text-xs" style={{ color: 'rgba(140,185,24,0.55)' }}>
+                  <Icon className="h-3.5 w-3.5" />
                   {label}
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 pt-5 border-t border-white/10">
-              <span className="inline-flex items-center gap-2 text-sm font-semibold text-blue-400 group-hover:gap-3 transition-all">
+            <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all"
+                    style={{ color: '#8cb918' }}>
                 Sign in as Customer
                 <ChevronRight className="h-4 w-4" />
               </span>
@@ -102,8 +144,10 @@ export function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="text-center pb-8 text-gray-600 text-sm">
-        © {new Date().getFullYear()} Der Stern · Food Distribution
+      <footer className="text-center pb-8" style={{ color: 'rgba(255,255,255,0.2)' }}>
+        <p className="text-xs tracking-widest uppercase">
+          © {new Date().getFullYear()} Der Stern · Grossmarkt Berlin
+        </p>
       </footer>
     </div>
   );

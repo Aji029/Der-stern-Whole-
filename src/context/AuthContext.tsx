@@ -56,10 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
           } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
             setUser(null);
-            navigate('/login');
-          } else if (event === 'TOKEN_REFRESHED') {
-            // Handle token refresh success
-            console.log('Auth token refreshed successfully');
+            // Don't redirect portal users — they have their own auth flow
+            const isPortalPath = window.location.pathname.startsWith('/portal');
+            if (!isPortalPath) {
+              navigate('/login');
+            }
           }
         });
 
