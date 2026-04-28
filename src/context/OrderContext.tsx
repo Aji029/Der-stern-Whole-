@@ -152,15 +152,18 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
       if (orderError) throw orderError;
 
-      // Delete existing items
-      const { error: deleteError } = await supabase
+      // Fetch existing item IDs BEFORE touching anything — if this fails,
+      // existingIds would be [] and the DELETE step would be skipped, leaving doubled items.
+      const { data: existingItems, error: existingError } = await supabase
         .from('order_items')
-        .delete()
+        .select('id')
         .eq('order_id', id);
 
-      if (deleteError) throw deleteError;
+      if (existingError) throw existingError;
 
-      // Insert new items with supplier_id
+      const existingIds = (existingItems ?? []).map(r => r.id);
+
+      // INSERT new items FIRST — if this fails, old items are still intact
       const orderItems = order.items.map(item => ({
         order_id: id,
         product_id: item.product.artikelNr,
@@ -176,6 +179,16 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Delete old items only AFTER the insert succeeded
+      if (existingIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('order_items')
+          .delete()
+          .in('id', existingIds);
+
+        if (deleteError) throw deleteError;
+      }
 
       await fetchOrders();
     } catch (error) {
