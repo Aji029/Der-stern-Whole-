@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ClipboardList, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePortal } from '../../features/portal/context/PortalContext';
@@ -15,6 +15,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 export function PortalOrderHistoryPage() {
   const { profile } = usePortal();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<PortalOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -63,7 +64,7 @@ export function PortalOrderHistoryPage() {
                 <tr
                   key={order.id}
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => window.location.assign(`/portal/orders/${order.id}`)}
+                  onClick={() => navigate(`/portal/orders/${order.id}`)}
                 >
                   <td className="px-5 py-4 font-medium text-gray-900">#{order.id}</td>
                   <td className="px-5 py-4 text-gray-500">{format(order.orderDate, 'MMM d, yyyy')}</td>

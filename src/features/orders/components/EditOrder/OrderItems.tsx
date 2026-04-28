@@ -52,7 +52,7 @@ export function OrderItems({
 
       <div className="space-y-4">
         {items.map((item, index) => (
-          <div key={index} className="border rounded-lg p-4 space-y-4">
+          <div key={item.product.artikelNr || `item-${index}`} className="border rounded-lg p-4 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Product

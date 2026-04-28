@@ -6,4 +6,5 @@ export interface Customer {
   phone: string;
   address: string;
   taxId: string;
+  createdAt?: Date;
 }

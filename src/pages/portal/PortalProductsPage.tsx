@@ -10,18 +10,23 @@ export function PortalProductsPage() {
   const [filtered, setFiltered] = useState<PortalProduct[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!profile?.customerId) return;
     setIsLoading(true);
+    setFetchError(null);
     fetchCustomerOrderedProducts(profile.customerId)
       .then(data => {
         setProducts(data);
         setFiltered(data);
       })
-      .catch(console.error)
+      .catch(err => {
+        console.error(err);
+        setFetchError('Failed to load products. Please try refreshing.');
+      })
       .finally(() => setIsLoading(false));
   }, [profile?.customerId]);
 
@@ -62,9 +67,9 @@ export function PortalProductsPage() {
     });
   };
 
-  if (profileError) {
+  if (profileError || fetchError) {
     return (
-      <div className="text-center py-16 text-red-500">{profileError}</div>
+      <div className="text-center py-16 text-red-500">{profileError || fetchError}</div>
     );
   }
 

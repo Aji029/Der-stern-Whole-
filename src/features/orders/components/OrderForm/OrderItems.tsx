@@ -72,7 +72,7 @@ export function OrderItems({ items, onChange, errors = {} }: OrderItemsProps) {
       </div>
 
       {items.map((item, index) => (
-        <div key={index} className="border rounded-lg p-4 space-y-4">
+        <div key={item.product.artikelNr || `item-${index}`} className="border rounded-lg p-4 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
