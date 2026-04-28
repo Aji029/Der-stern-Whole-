@@ -24,20 +24,23 @@ async function buildCustomerFreqMap(customerId: string): Promise<{
   freqMap: Record<string, number>;
   lastDateMap: Record<string, string>;
 }> {
-  const { data: orders } = await supabase
+  const { data: orders, error: ordersErr } = await supabase
     .from('orders')
     .select('id, order_date')
     .eq('customer_id', customerId);
 
+  if (ordersErr) throw ordersErr;
   if (!orders || orders.length === 0) return { freqMap: {}, lastDateMap: {} };
 
   const orderDateMap = Object.fromEntries(orders.map(o => [o.id as string, o.order_date as string]));
   const orderIds = orders.map(o => o.id as string);
 
-  const { data: items } = await supabase
+  const { data: items, error: itemsErr } = await supabase
     .from('order_items')
     .select('product_id, order_id')
     .in('order_id', orderIds);
+
+  if (itemsErr) throw itemsErr;
 
   if (!items) return { freqMap: {}, lastDateMap: {} };
 
@@ -87,10 +90,12 @@ export async function fetchCustomerTopProducts(customerId: string): Promise<Cust
 
   if (topIds.length === 0) return [];
 
-  const { data: products } = await supabase
+  const { data: products, error: productsErr } = await supabase
     .from('products')
     .select('artikel_nr, name, vk_price, ek_price, mwst, supplier_id, ist_bestand')
     .in('artikel_nr', topIds);
+
+  if (productsErr) throw productsErr;
 
   return (products || [])
     .map(p => ({
@@ -108,29 +113,33 @@ export async function fetchCustomerTopProducts(customerId: string): Promise<Cust
 }
 
 export async function fetchLastOrderItems(customerId: string): Promise<LastOrderInfo | null> {
-  const { data: orders } = await supabase
+  const { data: orders, error: ordersErr } = await supabase
     .from('orders')
     .select('id, order_date')
     .eq('customer_id', customerId)
     .order('order_date', { ascending: false })
     .limit(1);
 
+  if (ordersErr) throw ordersErr;
   if (!orders || orders.length === 0) return null;
 
   const lastOrder = orders[0];
 
-  const { data: items } = await supabase
+  const { data: items, error: itemsErr } = await supabase
     .from('order_items')
     .select('product_id, product_name, quantity, ek_price, vk_price')
     .eq('order_id', lastOrder.id);
 
+  if (itemsErr) throw itemsErr;
   if (!items || items.length === 0) return null;
 
   const productIds = items.map(i => i.product_id).filter(Boolean);
-  const { data: products } = await supabase
+  const { data: products, error: productsErr } = await supabase
     .from('products')
     .select('artikel_nr, mwst, supplier_id')
     .in('artikel_nr', productIds);
+
+  if (productsErr) throw productsErr;
 
   const productMeta = Object.fromEntries(
     (products || []).map(p => [p.artikel_nr, { mwst: p.mwst as 'A' | 'B', supplierId: p.supplier_id as string | undefined }])

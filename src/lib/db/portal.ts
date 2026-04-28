@@ -2,20 +2,22 @@ import { supabasePortal as supabase } from '../supabasePortal';
 import type { PortalProduct, PortalOrder, PortalOrderDetail, PortalCartItem } from '../../types/portal';
 
 export async function fetchCustomerOrderedProducts(customerId: string): Promise<PortalProduct[]> {
-  const { data: orders } = await supabase
+  const { data: orders, error: ordersErr } = await supabase
     .from('orders')
     .select('id')
     .eq('customer_id', customerId);
 
+  if (ordersErr) throw ordersErr;
   if (!orders || orders.length === 0) return [];
 
   const orderIds = orders.map(o => o.id as string);
 
-  const { data: items } = await supabase
+  const { data: items, error: itemsErr } = await supabase
     .from('order_items')
     .select('product_id')
     .in('order_id', orderIds);
 
+  if (itemsErr) throw itemsErr;
   if (!items || items.length === 0) return [];
 
   const uniqueProductIds = [...new Set(items.map(i => i.product_id).filter(Boolean))];
@@ -50,10 +52,12 @@ export async function fetchPortalOrders(customerId: string): Promise<PortalOrder
   let itemCountMap: Record<string, number> = {};
 
   if (orderIds.length > 0) {
-    const { data: items } = await supabase
+    const { data: items, error: countErr } = await supabase
       .from('order_items')
       .select('order_id')
       .in('order_id', orderIds);
+
+    if (countErr) throw countErr;
 
     for (const item of items || []) {
       itemCountMap[item.order_id] = (itemCountMap[item.order_id] || 0) + 1;
@@ -79,10 +83,12 @@ export async function fetchPortalOrderDetail(orderId: string, customerId: string
 
   if (error || !order) return null;
 
-  const { data: items } = await supabase
+  const { data: items, error: itemsErr } = await supabase
     .from('order_items')
     .select('product_id, product_name, quantity')
     .eq('order_id', orderId);
+
+  if (itemsErr) throw itemsErr;
 
   return {
     id: order.id,

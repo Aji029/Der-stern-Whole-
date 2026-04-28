@@ -128,9 +128,9 @@ export function OrderItems({ items, onChange, errors = {} }: OrderItemsProps) {
                 type="number"
                 min="1"
                 value={item.quantity}
-                onChange={(e) => handleUpdateItem(index, { 
-                  quantity: parseInt(e.target.value),
-                  total: parseInt(e.target.value) * item.vkPrice,
+                onChange={(e) => handleUpdateItem(index, {
+                  quantity: parseInt(e.target.value) || 1,
+                  total: (parseInt(e.target.value) || 1) * item.vkPrice,
                 })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500"
                 required
@@ -149,9 +149,9 @@ export function OrderItems({ items, onChange, errors = {} }: OrderItemsProps) {
                 step="0.01"
                 min="0"
                 value={item.vkPrice}
-                onChange={(e) => handleUpdateItem(index, { 
-                  vkPrice: parseFloat(e.target.value),
-                  total: item.quantity * parseFloat(e.target.value),
+                onChange={(e) => handleUpdateItem(index, {
+                  vkPrice: parseFloat(e.target.value) || 0,
+                  total: item.quantity * (parseFloat(e.target.value) || 0),
                 })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500"
                 required
