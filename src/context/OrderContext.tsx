@@ -51,11 +51,16 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
           ekPrice: Number(item.ek_price),
           vkPrice: Number(item.vk_price),
           total: Number(item.total),
-          product: {
+          product: item.product ? {
             artikelNr: item.product.artikel_nr,
             name: item.product.name,
             mwst: item.product.mwst,
             supplierId: item.supplier_id || item.product.supplier_id
+          } : {
+            artikelNr: item.product_id || '',
+            name: item.product_name || 'Unknown Product',
+            mwst: 'A' as const,
+            supplierId: item.supplier_id || undefined
           }
         })),
         status: order.status,

@@ -13,7 +13,7 @@ export interface GroupedOrders {
 export function useTodaysPick(selectedDate: string) {
   // Derive loading state from data source — avoids stale isLoading when
   // OrderContext is still fetching.
-  const { orders, isLoading: ordersLoading } = useOrders();
+  const { orders, isLoading: ordersLoading, error: ordersError } = useOrders();
   const { suppliers } = useSuppliers();
   const [groupedOrders, setGroupedOrders] = useState<GroupedOrders[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +77,6 @@ export function useTodaysPick(selectedDate: string) {
   return {
     groupedOrders,
     isLoading: ordersLoading,
-    error,
+    error: ordersError || error,
   };
 }
