@@ -37,7 +37,9 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
       if (fetchError) throw fetchError;
 
-      const transformedOrders = (data || []).map(order => ({
+      const transformedOrders = (data || [])
+        .filter(order => order.customer !== null)
+        .map(order => ({
         id: order.id,
         customer: {
           id: order.customer.id,
