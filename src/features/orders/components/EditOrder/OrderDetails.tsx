@@ -25,15 +25,15 @@ export function OrderDetails({
           <div className="space-y-3">
             <div>
               <p className="text-sm font-medium text-gray-500">Company</p>
-              <p className="text-sm">{order.customer.companyName}</p>
+              <p className="text-sm">{order.customer?.companyName ?? 'Unknown Customer'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Contact Person</p>
-              <p className="text-sm">{order.customer.contactPerson}</p>
+              <p className="text-sm">{order.customer?.contactPerson ?? '—'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Customer Number</p>
-              <p className="text-sm">{order.customer.id}</p>
+              <p className="text-sm">{order.customer?.id ?? '—'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Outstanding Payment</p>

@@ -50,10 +50,10 @@ export function OrderHeader({ order }: OrderHeaderProps) {
           <div>
             <h3 className="text-sm font-medium text-gray-500">Customer Information</h3>
             <div className="mt-1">
-              <p className="text-sm font-medium text-gray-900">{order.customer.companyName}</p>
-              <p className="text-sm text-gray-500">{order.customer.contactPerson}</p>
-              <p className="text-sm text-gray-500">{order.customer.email}</p>
-              <p className="text-sm text-gray-500">{order.customer.phone}</p>
+              <p className="text-sm font-medium text-gray-900">{order.customer?.companyName ?? 'Unknown Customer'}</p>
+              <p className="text-sm text-gray-500">{order.customer?.contactPerson ?? ''}</p>
+              <p className="text-sm text-gray-500">{order.customer?.email ?? ''}</p>
+              <p className="text-sm text-gray-500">{order.customer?.phone ?? ''}</p>
             </div>
           </div>
           
