@@ -38,40 +38,31 @@ export function SupplierProvider({ children }: { children: React.ReactNode }) {
 
   const addSupplierContext = async (supplier: Omit<Supplier, 'id'>) => {
     try {
-      setIsLoading(true);
       await createSupplier(supplier);
-      await loadSuppliers(); // Reload suppliers after creation
+      await loadSuppliers();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const updateSupplierContext = async (id: string, supplier: Supplier) => {
     try {
-      setIsLoading(true);
       await updateSupplier(id, supplier);
-      await loadSuppliers(); // Reload suppliers after update
+      await loadSuppliers();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const deleteSupplierContext = async (id: string) => {
     try {
-      setIsLoading(true);
       await deleteSupplier(id);
-      await loadSuppliers(); // Reload suppliers after deletion
+      await loadSuppliers();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -90,8 +90,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   const addOrder = async (orderData: Omit<Order, 'id'>) => {
     try {
-      setIsLoading(true);
-      
       // Insert order
       const { data: orderResult, error: orderError } = await supabase
         .from('orders')
@@ -131,15 +129,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Failed to create order:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const updateOrder = async (id: string, order: Order) => {
     try {
-      setIsLoading(true);
-
       // Update order details
       const { error: orderError } = await supabase
         .from('orders')
@@ -199,15 +193,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Failed to update order:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const deleteOrder = async (id: string) => {
     try {
-      setIsLoading(true);
-
       const { error } = await supabase
         .from('orders')
         .delete()
@@ -219,8 +209,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Failed to delete order:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -38,40 +38,31 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
 
   const addCustomerContext = async (customer: Omit<Customer, 'id'>) => {
     try {
-      setIsLoading(true);
       await createCustomer(customer);
       await loadCustomers();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const updateCustomerContext = async (id: string, customer: Customer) => {
     try {
-      setIsLoading(true);
       await updateCustomer(id, customer);
       await loadCustomers();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const deleteCustomerContext = async (id: string) => {
     try {
-      setIsLoading(true);
       await deleteCustomer(id);
       await loadCustomers();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
