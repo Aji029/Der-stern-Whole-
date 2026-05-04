@@ -51,7 +51,9 @@ export function OrderItems({
       </div>
 
       {items.map((item, index) => (
+
         <div key={item.product?.artikelNr || `item-${index}`} className="border rounded-lg p-4 space-y-4">
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Product
