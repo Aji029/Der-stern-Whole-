@@ -24,7 +24,8 @@ export async function fetchProducts(): Promise<Product[]> {
       herkunftsland: item.herkunftsland,
       produktgruppe: item.produktgruppe,
       supplierId: item.supplier_id,
-      image: item.image_url
+      image: item.image_url,
+      createdAt: item.created_at ? new Date(item.created_at) : undefined,
     }));
   } catch (error) {
     console.error('Failed to fetch products:', error);

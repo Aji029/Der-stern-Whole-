@@ -52,7 +52,7 @@ export function OrderItems({
 
       <div className="space-y-4">
         {items.map((item, index) => (
-          <div key={index} className="border rounded-lg p-4 space-y-4">
+          <div key={item.product.artikelNr || `item-${index}`} className="border rounded-lg p-4 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Product
@@ -80,9 +80,9 @@ export function OrderItems({
                   type="number"
                   min="1"
                   value={item.quantity}
-                  onChange={(e) => onUpdateItem(index, { 
-                    quantity: parseInt(e.target.value),
-                    total: parseInt(e.target.value) * item.vkPrice,
+                  onChange={(e) => onUpdateItem(index, {
+                    quantity: parseInt(e.target.value) || 1,
+                    total: (parseInt(e.target.value) || 1) * item.vkPrice,
                   })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500"
                 />

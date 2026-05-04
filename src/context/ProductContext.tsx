@@ -42,40 +42,31 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   const addProduct = async (newProduct: Omit<Product, 'image'> & { image: File | null }) => {
     try {
-      setIsLoading(true);
       await createProduct(newProduct);
-      await loadProducts(); // Reload products after creation
+      await loadProducts();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const updateProductContext = async (artikelNr: string, updatedProduct: Omit<Product, 'image'> & { image: File | null }) => {
     try {
-      setIsLoading(true);
       await updateProduct(artikelNr, updatedProduct);
-      await loadProducts(); // Reload products after update
+      await loadProducts();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const deleteProductContext = async (artikelNr: string) => {
     try {
-      setIsLoading(true);
       await deleteProduct(artikelNr);
-      await loadProducts(); // Reload products after deletion
+      await loadProducts();
     } catch (err: any) {
       setError(err.message);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -10,4 +10,5 @@ export interface Product {
   produktgruppe: string;
   supplierId?: string;
   image?: string | null;
+  createdAt?: Date;
 }

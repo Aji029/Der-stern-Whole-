@@ -29,43 +29,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check active session and set up auth subscription
+    let subscriptionCleanup: (() => void) | undefined;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email!,
+          name: session.user.user_metadata.name || '',
+          role: (session.user.user_metadata?.role as User['role']) ?? 'admin',
+          createdAt: new Date(session.user.created_at),
+        });
+      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        setUser(null);
+        const isPortalPath = window.location.pathname.startsWith('/portal');
+        if (!isPortalPath) {
+          navigate('/login');
+        }
+      }
+    });
+    subscriptionCleanup = () => subscription.unsubscribe();
+
     const initializeAuth = async () => {
       try {
-        // Get initial session
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser({
             id: session.user.id,
             email: session.user.email!,
             name: session.user.user_metadata.name || '',
-            role: 'customer',
+            role: (session.user.user_metadata?.role as User['role']) ?? 'admin',
             createdAt: new Date(session.user.created_at),
           });
         }
-
-        // Set up auth state change listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-          if (event === 'SIGNED_IN' && session?.user) {
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-              name: session.user.user_metadata.name || '',
-              role: 'customer',
-              createdAt: new Date(session.user.created_at),
-            });
-          } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-            setUser(null);
-            navigate('/login');
-          } else if (event === 'TOKEN_REFRESHED') {
-            // Handle token refresh success
-            console.log('Auth token refreshed successfully');
-          }
-        });
-
-        return () => {
-          subscription.unsubscribe();
-        };
       } catch (error) {
         console.error('Auth initialization error:', error);
         setUser(null);
@@ -75,6 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     initializeAuth();
+
+    return () => subscriptionCleanup?.();
   }, [navigate]);
 
   const login = async (email: string, password: string) => {

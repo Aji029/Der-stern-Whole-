@@ -15,6 +15,7 @@ export function EndDayModal({ isOpen, onClose }: EndDayModalProps) {
   const { orders, updateOrder } = useOrders();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [endDayError, setEndDayError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -29,8 +30,8 @@ export function EndDayModal({ isOpen, onClose }: EndDayModalProps) {
 
   const handleEndDay = async () => {
     setIsProcessing(true);
+    setEndDayError(null);
     try {
-      // Update all orders to completed status
       await Promise.all(
         todaysOrders.map(order =>
           updateOrder(order.id, {
@@ -41,8 +42,9 @@ export function EndDayModal({ isOpen, onClose }: EndDayModalProps) {
         )
       );
       setIsCompleted(true);
-    } catch (error) {
-      console.error('Error ending day:', error);
+    } catch (err: any) {
+      console.error('Error ending day:', err);
+      setEndDayError(err?.message || 'Failed to complete orders. Please try again.');
     }
     setIsProcessing(false);
   };
@@ -81,6 +83,12 @@ export function EndDayModal({ isOpen, onClose }: EndDayModalProps) {
                   Found {todaysOrders.length} orders to process.
                 </p>
               </div>
+
+              {endDayError && (
+                <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                  {endDayError}
+                </div>
+              )}
 
               <div className="flex justify-end space-x-3">
                 <Button

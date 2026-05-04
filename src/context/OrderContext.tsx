@@ -51,11 +51,16 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
           ekPrice: Number(item.ek_price),
           vkPrice: Number(item.vk_price),
           total: Number(item.total),
-          product: {
+          product: item.product ? {
             artikelNr: item.product.artikel_nr,
             name: item.product.name,
             mwst: item.product.mwst,
             supplierId: item.supplier_id || item.product.supplier_id
+          } : {
+            artikelNr: item.product_id || '',
+            name: item.product_name || 'Unknown Product',
+            mwst: 'A' as const,
+            supplierId: item.supplier_id || undefined
           }
         })),
         status: order.status,
@@ -85,8 +90,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   const addOrder = async (orderData: Omit<Order, 'id'>) => {
     try {
-      setIsLoading(true);
-      
       // Insert order
       const { data: orderResult, error: orderError } = await supabase
         .from('orders')
@@ -126,15 +129,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Failed to create order:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const updateOrder = async (id: string, order: Order) => {
     try {
-      setIsLoading(true);
-
       // Update order details
       const { error: orderError } = await supabase
         .from('orders')
@@ -152,15 +151,18 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
       if (orderError) throw orderError;
 
-      // Delete existing items
-      const { error: deleteError } = await supabase
+      // Fetch existing item IDs BEFORE touching anything — if this fails,
+      // existingIds would be [] and the DELETE step would be skipped, leaving doubled items.
+      const { data: existingItems, error: existingError } = await supabase
         .from('order_items')
-        .delete()
+        .select('id')
         .eq('order_id', id);
 
-      if (deleteError) throw deleteError;
+      if (existingError) throw existingError;
 
-      // Insert new items with supplier_id
+      const existingIds = (existingItems ?? []).map(r => r.id);
+
+      // INSERT new items FIRST — if this fails, old items are still intact
       const orderItems = order.items.map(item => ({
         order_id: id,
         product_id: item.product.artikelNr,
@@ -177,19 +179,25 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
       if (itemsError) throw itemsError;
 
+      // Delete old items only AFTER the insert succeeded
+      if (existingIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('order_items')
+          .delete()
+          .in('id', existingIds);
+
+        if (deleteError) throw deleteError;
+      }
+
       await fetchOrders();
     } catch (error) {
       console.error('Failed to update order:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const deleteOrder = async (id: string) => {
     try {
-      setIsLoading(true);
-
       const { error } = await supabase
         .from('orders')
         .delete()
@@ -201,8 +209,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Failed to delete order:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -25,6 +25,7 @@ export async function fetchCustomers(): Promise<Customer[]> {
       phone: item.phone,
       address: item.address,
       taxId: item.tax_id,
+      createdAt: item.created_at ? new Date(item.created_at) : undefined,
     }));
   } catch (error) {
     console.error('Failed to fetch customers:', error);

@@ -91,7 +91,7 @@ export function OrderDetailsPage() {
             <h3 className="text-lg font-medium mb-3">Products</h3>
             <div className="space-y-4">
               {order.items.map((item: any, index: number) => (
-                <div key={index} className="border rounded-lg p-4">
+                <div key={item.product?.artikelNr || index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="font-medium">{item.product.name}</div>

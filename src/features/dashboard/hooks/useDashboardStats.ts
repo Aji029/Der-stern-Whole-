@@ -63,26 +63,24 @@ export function useDashboardStats() {
 
     // Calculate product stats
     const totalProducts = products.length;
-    const recentProducts = products.filter(product => new Date(product.created_at) >= thirtyDaysAgo).length;
-    const previousProducts = products.filter(product => {
-      const createdAt = new Date(product.created_at);
-      return createdAt >= previousPeriodStart && createdAt < thirtyDaysAgo;
+    const recentProducts = products.filter(p => p.createdAt && p.createdAt >= thirtyDaysAgo).length;
+    const previousProducts = products.filter(p => {
+      return p.createdAt && p.createdAt >= previousPeriodStart && p.createdAt < thirtyDaysAgo;
     }).length;
-    
-    const productsChange = previousProducts === 0 
-      ? 100 
+
+    const productsChange = previousProducts === 0
+      ? 100
       : ((recentProducts - previousProducts) / previousProducts) * 100;
 
     // Calculate customer stats
     const totalCustomers = customers.length;
-    const recentCustomers = customers.filter(customer => new Date(customer.created_at) >= thirtyDaysAgo).length;
-    const previousCustomers = customers.filter(customer => {
-      const createdAt = new Date(customer.created_at);
-      return createdAt >= previousPeriodStart && createdAt < thirtyDaysAgo;
+    const recentCustomers = customers.filter(c => c.createdAt && c.createdAt >= thirtyDaysAgo).length;
+    const previousCustomers = customers.filter(c => {
+      return c.createdAt && c.createdAt >= previousPeriodStart && c.createdAt < thirtyDaysAgo;
     }).length;
-    
-    const customersChange = previousCustomers === 0 
-      ? 100 
+
+    const customersChange = previousCustomers === 0
+      ? 100
       : ((recentCustomers - previousCustomers) / previousCustomers) * 100;
 
     return {
