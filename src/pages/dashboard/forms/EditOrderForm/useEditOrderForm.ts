@@ -6,12 +6,16 @@ import type { OrderFormData } from '../AddOrderForm/types';
 
 export function useEditOrderForm(orderId: string) {
   const navigate = useNavigate();
-  const { getOrder, updateOrder } = useOrders();
+  const { getOrder, updateOrder, isLoading } = useOrders();
   const [formData, setFormData] = useState<OrderFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    // Don't redirect while orders are still loading — getOrder() returns
+    // undefined during initial fetch even when the order exists.
+    if (isLoading) return;
+
     const order = getOrder(orderId);
     if (order) {
       setFormData({
@@ -26,7 +30,7 @@ export function useEditOrderForm(orderId: string) {
     } else {
       navigate('/dashboard/orders');
     }
-  }, [orderId, getOrder, navigate]);
+  }, [orderId, getOrder, navigate, isLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

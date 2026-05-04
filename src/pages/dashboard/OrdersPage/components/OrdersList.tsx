@@ -32,7 +32,7 @@ export function OrdersList() {
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    {order.customer.companyName}
+                    {order.customer?.companyName ?? 'Unknown Customer'}
                   </div>
                   <div className="text-sm text-gray-500">
                     {new Date(order.orderDate).toLocaleDateString()}
@@ -43,19 +43,13 @@ export function OrdersList() {
                     {order.items.length} items
                   </div>
                   <div className="text-sm text-gray-500">
-                    {order.items.map(item => item.product.name).join(', ').slice(0, 50)}
+                    {order.items.map(item => item.product?.name ?? 'Unknown').join(', ').slice(0, 50)}
                     {order.items.length > 1 && '...'}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className={`text-sm font-medium ${
-                    order.profitMargin > 10
-                      ? 'text-green-600'
-                      : order.profitMargin > 0
-                      ? 'text-yellow-600'
-                      : 'text-red-600'
-                  }`}>
-                    €{order.totalAmount.toFixed(2)}
+                  <div className="text-sm font-medium text-gray-900">
+                    €{(order.totalAmount ?? 0).toFixed(2)}
                   </div>
                 </td>
               </tr>

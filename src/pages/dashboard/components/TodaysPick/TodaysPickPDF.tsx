@@ -64,12 +64,12 @@ export function TodaysPickPDF({ groupedOrders, selectedDate }: TodaysPickPDFProp
             </Text>
 
             {group.items.map((item, index) => (
-              <View key={`${item.product.artikelNr}-${index}`} style={styles.item}>
+              <View key={`${item.product?.artikelNr ?? index}-${index}`} style={styles.item}>
                 <Text style={styles.itemName}>
-                  {item.product.name}
+                  {item.product?.name ?? 'Unknown Product'}
                 </Text>
                 <Text style={styles.itemDetails}>
-                  Art. Nr: {item.product.artikelNr} - Quantity: {item.quantity}
+                  Art. Nr: {item.product?.artikelNr ?? '—'} - Quantity: {item.quantity}
                 </Text>
               </View>
             ))}

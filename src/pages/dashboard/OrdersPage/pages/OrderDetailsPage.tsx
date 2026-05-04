@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader } from 'lucide-react';
 import { useOrders } from '../context/OrdersContext';
 import { useProducts } from '../../../../context/ProductContext';
 import { useSuppliers } from '../../../../context/SupplierContext';
+import { useOrders as useOrdersData } from '../../../../context/OrderContext';
 import { Button } from '../../../../components/ui/Button';
 import { EditablePrice } from '../../../../components/ui/EditablePrice';
 import { ProfitMarginDisplay } from '../../../../components/ProfitMarginDisplay';
@@ -12,13 +13,15 @@ export function OrderDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { getOrder, updateOrder } = useOrders();
+  const { isLoading: ordersLoading } = useOrdersData();
   const { products } = useProducts();
   const { suppliers } = useSuppliers();
   const [order, setOrder] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
+    if (id && !ordersLoading) {
       const orderData = getOrder(id);
       if (orderData) {
         setOrder(orderData);
@@ -26,16 +29,24 @@ export function OrderDetailsPage() {
         navigate('/dashboard/orders');
       }
     }
-  }, [id, getOrder, navigate]);
+  }, [id, getOrder, navigate, ordersLoading]);
 
-  if (!order) return null;
+  if (ordersLoading || !order) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   const handleSave = async () => {
+    setSaveError(null);
     try {
       await updateOrder(id!, order);
       setIsEditing(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating order:', error);
+      setSaveError(error?.message || 'Failed to save changes. Please try again.');
     }
   };
 
@@ -67,6 +78,12 @@ export function OrderDetailsPage() {
         </div>
       </div>
 
+      {saveError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+          {saveError}
+        </div>
+      )}
+
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-6">Order Details</h2>
         
@@ -77,11 +94,11 @@ export function OrderDetailsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-500">Company</label>
-                <div className="mt-1 text-sm">{order.customer.companyName}</div>
+                <div className="mt-1 text-sm">{order.customer?.companyName ?? 'Unknown Customer'}</div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">Contact</label>
-                <div className="mt-1 text-sm">{order.customer.contactPerson}</div>
+                <div className="mt-1 text-sm">{order.customer?.contactPerson ?? '—'}</div>
               </div>
             </div>
           </div>
@@ -94,7 +111,7 @@ export function OrderDetailsPage() {
                 <div key={item.product?.artikelNr || index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <div className="font-medium">{item.product.name}</div>
+                      <div className="font-medium">{item.product?.name ?? 'Unknown Product'}</div>
                       <div className="text-sm text-gray-500">
                         Quantity: {isEditing ? (
                           <input
@@ -104,7 +121,7 @@ export function OrderDetailsPage() {
                               const newItems = [...order.items];
                               newItems[index] = {
                                 ...item,
-                                quantity: parseInt(e.target.value),
+                                quantity: parseInt(e.target.value) || 1,
                               };
                               setOrder({ ...order, items: newItems });
                             }}
@@ -170,7 +187,7 @@ export function OrderDetailsPage() {
                         <ProfitMarginDisplay
                           ekPrice={item.ekPrice}
                           vkPrice={item.vkPrice}
-                          mwst={item.product.mwst}
+                          mwst={item.product?.mwst ?? 'A'}
                         />
                       </div>
                     </div>
@@ -213,16 +230,19 @@ export function OrderDetailsPage() {
               <div className="mt-4">
                 <Button
                   variant="outline"
+                  disabled={products.length === 0}
                   onClick={() => {
+                    if (products.length === 0) return;
                     setOrder({
                       ...order,
                       items: [
                         ...order.items,
                         {
-                          product: products[0],
+                          product: { artikelNr: '', name: '', mwst: 'A', supplierId: '' },
                           quantity: 1,
-                          ekPrice: products[0].ekPrice,
-                          vkPrice: products[0].vkPrice,
+                          ekPrice: 0,
+                          vkPrice: 0,
+                          total: 0,
                         },
                       ],
                     });
