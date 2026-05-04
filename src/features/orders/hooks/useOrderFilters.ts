@@ -18,10 +18,10 @@ export function useOrderFilters() {
     return orders.filter(order => {
       // Search filter
       const searchTerm = filters.search.toLowerCase();
-      const searchMatch = !searchTerm || 
+      const searchMatch = !searchTerm ||
         order.id.toLowerCase().includes(searchTerm) ||
-        order.customer.companyName.toLowerCase().includes(searchTerm) ||
-        order.customer.contactPerson.toLowerCase().includes(searchTerm);
+        order.customer?.companyName?.toLowerCase().includes(searchTerm) ||
+        order.customer?.contactPerson?.toLowerCase().includes(searchTerm);
 
       // Date filter
       const dateMatch = !filters.date || 

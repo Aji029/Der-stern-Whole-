@@ -27,8 +27,11 @@ export async function fetchOrders(): Promise<Order[]> {
       return [];
     }
 
-    // Parse dates and format data
-    return data.map(order => ({
+    // Parse dates and format data — filter orders whose customer was deleted
+    // or blocked by RLS (Supabase returns null for the join in that case).
+    return data
+      .filter(order => order.customer !== null)
+      .map(order => ({
       id: order.id,
       customer: {
         id: order.customer.id,
@@ -39,13 +42,18 @@ export async function fetchOrders(): Promise<Order[]> {
         address: order.customer.address,
         taxId: order.customer.tax_id,
       },
-      items: order.items.map((item: any) => ({
+      items: (order.items || []).map((item: any) => ({
         id: item.id,
-        product: {
+        product: item.product ? {
           artikelNr: item.product.artikel_nr,
           name: item.product.name,
-          supplierId: item.product.supplier_id,
+          supplierId: item.supplier_id || item.product.supplier_id,
           mwst: item.product.mwst,
+        } : {
+          artikelNr: item.product_id || '',
+          name: 'Unknown Product',
+          supplierId: item.supplier_id || undefined,
+          mwst: 'A' as const,
         },
         quantity: item.quantity,
         ekPrice: item.ek_price,
