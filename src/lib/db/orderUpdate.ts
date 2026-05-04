@@ -42,7 +42,8 @@ export async function updateOrder(id: string, order: Order): Promise<void> {
           quantity: item.quantity,
           ek_price: item.ekPrice,
           vk_price: item.vkPrice,
-          total: item.quantity * item.vkPrice
+          total: item.quantity * item.vkPrice,
+          supplier_id: item.product?.supplierId || null,
         }));
 
       if (validItems.length > 0) {

@@ -48,13 +48,13 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const filteredOrders = React.useMemo(() => {
     return allOrders.filter(order => {
       if (filters.search && !order.id.toLowerCase().includes(filters.search.toLowerCase()) &&
-          !order.customer.companyName.toLowerCase().includes(filters.search.toLowerCase())) {
+          !order.customer?.companyName?.toLowerCase().includes(filters.search.toLowerCase())) {
         return false;
       }
       if (filters.status && order.status !== filters.status) {
         return false;
       }
-      if (filters.supplierId && !order.items.some(item => item.product.supplierId === filters.supplierId)) {
+      if (filters.supplierId && !order.items.some(item => item.product?.supplierId === filters.supplierId)) {
         return false;
       }
       if (filters.dateFrom && new Date(order.orderDate) < new Date(filters.dateFrom)) {
