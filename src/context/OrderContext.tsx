@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import type { Order } from '../types/order';
 
 interface OrderContextType {
@@ -67,7 +67,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         })),
         status: order.status,
         totalAmount: Number(order.total_amount),
-        orderDate: new Date(order.order_date),
+        orderDate: parseISO(order.order_date),
         deliveryDate: order.delivery_date ? new Date(order.delivery_date) : undefined,
         paymentStatus: order.payment_status,
         shippingAddress: order.shipping_address,
