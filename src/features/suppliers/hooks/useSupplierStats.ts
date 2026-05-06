@@ -25,8 +25,8 @@ export function useSupplierStats(date?: Date) {
     // Calculate stats for each supplier
     return suppliers.map(supplier => {
       // Get all products for this supplier that need to be picked today
-      const supplierProducts = todaysProducts.filter(item => 
-        item.product.supplierId === supplier.id
+      const supplierProducts = todaysProducts.filter(item =>
+        item.product?.supplierId === supplier.id
       );
 
       // Calculate total amount for this supplier's products
