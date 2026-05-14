@@ -12,8 +12,9 @@ import { ProfitMarginDisplay } from '../../../../components/ProfitMarginDisplay'
 export function OrderDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getOrder, updateOrder } = useOrders();
-  const { isLoading: ordersLoading } = useOrdersData();
+  const { updateOrder } = useOrders();
+  // getOrder must come from the global OrderContext — the local OrdersContext does not expose it
+  const { isLoading: ordersLoading, getOrder } = useOrdersData();
   const { products } = useProducts();
   const { suppliers } = useSuppliers();
   const [order, setOrder] = useState<any>(null);
@@ -21,6 +22,9 @@ export function OrderDetailsPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Skip while the user is actively editing — fetchOrders() runs after every
+    // mutation and would overwrite the local edits before Save is clicked.
+    if (isEditing) return;
     if (id && !ordersLoading) {
       const orderData = getOrder(id);
       if (orderData) {
@@ -29,7 +33,7 @@ export function OrderDetailsPage() {
         navigate('/dashboard/orders');
       }
     }
-  }, [id, getOrder, navigate, ordersLoading]);
+  }, [id, getOrder, navigate, ordersLoading, isEditing]);
 
   if (ordersLoading || !order) {
     return (
@@ -38,6 +42,9 @@ export function OrderDetailsPage() {
       </div>
     );
   }
+
+  const recalcTotal = (items: any[]) =>
+    items.reduce((sum, i) => sum + (i.quantity * i.vkPrice), 0);
 
   const handleSave = async () => {
     setSaveError(null);
@@ -86,7 +93,7 @@ export function OrderDetailsPage() {
 
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-6">Order Details</h2>
-        
+
         <div className="space-y-6">
           {/* Customer Information */}
           <div>
@@ -118,12 +125,10 @@ export function OrderDetailsPage() {
                             type="number"
                             value={item.quantity}
                             onChange={(e) => {
+                              const qty = parseInt(e.target.value) || 1;
                               const newItems = [...order.items];
-                              newItems[index] = {
-                                ...item,
-                                quantity: parseInt(e.target.value) || 1,
-                              };
-                              setOrder({ ...order, items: newItems });
+                              newItems[index] = { ...item, quantity: qty, total: qty * item.vkPrice };
+                              setOrder({ ...order, items: newItems, totalAmount: recalcTotal(newItems) });
                             }}
                             className="w-20 px-2 py-1 border rounded"
                           />
@@ -136,7 +141,7 @@ export function OrderDetailsPage() {
                         size="sm"
                         onClick={() => {
                           const newItems = order.items.filter((_: any, i: number) => i !== index);
-                          setOrder({ ...order, items: newItems });
+                          setOrder({ ...order, items: newItems, totalAmount: recalcTotal(newItems) });
                         }}
                       >
                         Remove
@@ -152,10 +157,7 @@ export function OrderDetailsPage() {
                           value={item.ekPrice}
                           onChange={(value) => {
                             const newItems = [...order.items];
-                            newItems[index] = {
-                              ...item,
-                              ekPrice: value,
-                            };
+                            newItems[index] = { ...item, ekPrice: value };
                             setOrder({ ...order, items: newItems });
                           }}
                         />
@@ -170,11 +172,8 @@ export function OrderDetailsPage() {
                           value={item.vkPrice}
                           onChange={(value) => {
                             const newItems = [...order.items];
-                            newItems[index] = {
-                              ...item,
-                              vkPrice: value,
-                            };
-                            setOrder({ ...order, items: newItems });
+                            newItems[index] = { ...item, vkPrice: value, total: item.quantity * value };
+                            setOrder({ ...order, items: newItems, totalAmount: recalcTotal(newItems) });
                           }}
                         />
                       ) : (
@@ -199,7 +198,7 @@ export function OrderDetailsPage() {
                         Supplier
                       </label>
                       <select
-                        value={item.product.supplierId || ''}
+                        value={item.product?.supplierId || ''}
                         onChange={(e) => {
                           const newItems = [...order.items];
                           newItems[index] = {
