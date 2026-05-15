@@ -4,7 +4,7 @@ import { Button } from '../../../../components/ui/Button';
 import { EditablePrice } from '../../../../components/ui/EditablePrice';
 import { ProfitMarginDisplay } from '../../../../components/ProfitMarginDisplay';
 import { SupplierSelect } from '../../../../components/orders/SupplierSelect';
-import { formatPrice } from '../../../../utils/priceCalculations';
+import { formatPrice, calculateProfitAmount } from '../../../../utils/priceCalculations';
 import type { OrderItem } from '../../../../types/order';
 
 interface OrderItemsProps {
@@ -131,11 +131,34 @@ export function OrderItems({
             </div>
 
             <div className="flex justify-between items-center">
-              <ProfitMarginDisplay
-                ekPrice={item.ekPrice}
-                vkPrice={item.vkPrice}
-                mwst={item.product.mwst}
-              />
+              <div className="flex items-center gap-6">
+                <div>
+                  <span className="text-xs text-gray-500 mr-1">Margin:</span>
+                  <ProfitMarginDisplay
+                    ekPrice={item.ekPrice}
+                    vkPrice={item.vkPrice}
+                    mwst={item.product.mwst}
+                  />
+                </div>
+                {(() => {
+                  const mwst = item.product?.mwst ?? 'A';
+                  const profitPerUnit = calculateProfitAmount(item.ekPrice, item.vkPrice, mwst);
+                  const lineProfit = profitPerUnit * item.quantity;
+                  const color = lineProfit > 0 ? 'text-green-600' : lineProfit < 0 ? 'text-red-600' : 'text-gray-500';
+                  return (
+                    <>
+                      <div>
+                        <span className="text-xs text-gray-500 mr-1">Profit/Unit:</span>
+                        <span className={`text-sm font-medium ${color}`}>{formatPrice(profitPerUnit)}</span>
+                      </div>
+                      <div>
+                        <span className="text-xs text-gray-500 mr-1">Line Profit:</span>
+                        <span className={`text-sm font-medium ${color}`}>{formatPrice(lineProfit)}</span>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
               <div className="flex items-center space-x-2">
                 <div className="text-sm font-medium text-gray-700">
                   Total: {formatPrice(item.total || (item.quantity * item.vkPrice))}
@@ -152,6 +175,20 @@ export function OrderItems({
             </div>
           </div>
         ))}
+
+        {items.length > 0 && (() => {
+          const totalProfit = items.reduce((sum, item) => {
+            const mwst = item.product?.mwst ?? 'A';
+            return sum + calculateProfitAmount(item.ekPrice, item.vkPrice, mwst) * item.quantity;
+          }, 0);
+          const color = totalProfit > 0 ? 'text-green-600' : totalProfit < 0 ? 'text-red-600' : 'text-gray-500';
+          return (
+            <div className="flex justify-end items-center border-t pt-4 mt-2">
+              <span className="text-sm font-medium text-gray-700 mr-3">Total Profit:</span>
+              <span className={`text-lg font-semibold ${color}`}>{formatPrice(totalProfit)}</span>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
