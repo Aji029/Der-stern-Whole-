@@ -35,3 +35,10 @@ export const validatePrices = (ekPrice: number | undefined, vkPrice: number | un
 export const calculateOrderTotal = (items: Array<{ quantity: number; vkPrice: number }>): number => {
   return items.reduce((total, item) => total + (item.quantity * item.vkPrice), 0);
 };
+
+export const calculateProfitAmount = (ekPrice: number | undefined, vkPrice: number | undefined, mwst: 'A' | 'B'): number => {
+  if (!ekPrice || !vkPrice) return 0;
+  const taxRate = mwst === 'A' ? 0.07 : 0.19;
+  const vkPriceBeforeTax = vkPrice / (1 + taxRate);
+  return vkPriceBeforeTax - ekPrice;
+};

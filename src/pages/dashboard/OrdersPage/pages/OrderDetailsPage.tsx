@@ -8,6 +8,7 @@ import { useOrders as useOrdersData } from '../../../../context/OrderContext';
 import { Button } from '../../../../components/ui/Button';
 import { EditablePrice } from '../../../../components/ui/EditablePrice';
 import { ProfitMarginDisplay } from '../../../../components/ProfitMarginDisplay';
+import { calculateProfitAmount, formatPrice } from '../../../../utils/priceCalculations';
 
 export function OrderDetailsPage() {
   const { id } = useParams();
@@ -190,6 +191,24 @@ export function OrderDetailsPage() {
                         />
                       </div>
                     </div>
+                    {(() => {
+                      const mwst = item.product?.mwst ?? 'A';
+                      const profitPerUnit = calculateProfitAmount(item.ekPrice, item.vkPrice, mwst);
+                      const lineProfit = profitPerUnit * item.quantity;
+                      const color = lineProfit > 0 ? 'text-green-600' : lineProfit < 0 ? 'text-red-600' : 'text-gray-500';
+                      return (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-500">Profit/Unit</label>
+                            <div className={`mt-1 font-medium ${color}`}>{formatPrice(profitPerUnit)}</div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-500">Line Profit</label>
+                            <div className={`mt-1 font-medium ${color}`}>{formatPrice(lineProfit)}</div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {isEditing && (
@@ -256,13 +275,28 @@ export function OrderDetailsPage() {
           {/* Order Summary */}
           <div>
             <h3 className="text-lg font-medium mb-3">Order Summary</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total Amount:</span>
                 <span className="text-xl font-semibold">
                   €{order.totalAmount.toFixed(2)}
                 </span>
               </div>
+              {(() => {
+                const totalProfit = order.items.reduce((sum: number, item: any) => {
+                  const mwst = item.product?.mwst ?? 'A';
+                  return sum + calculateProfitAmount(item.ekPrice, item.vkPrice, mwst) * item.quantity;
+                }, 0);
+                const color = totalProfit > 0 ? 'text-green-600' : totalProfit < 0 ? 'text-red-600' : 'text-gray-500';
+                return (
+                  <div className="flex justify-between items-center border-t pt-3">
+                    <span className="font-medium">Total Profit:</span>
+                    <span className={`text-xl font-semibold ${color}`}>
+                      {formatPrice(totalProfit)}
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
