@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Loader, ChevronDown, ChevronRight, CheckCircle2, X } from 'lucide-react';
 import { TodaysPickPDF } from './TodaysPickPDF';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -39,9 +39,16 @@ export function TodaysPickList({
   onUnmarkAllForSupplier,
   onClearAll,
 }: TodaysPickListProps) {
-  // Only the currently-expanded supplier group renders its items, preventing
-  // the browser from freezing when there are 100+ items across many suppliers.
+  // Only one expanded supplier group renders items at a time (performance guard
+  // for 100+ item lists). Auto-open the first group so items are immediately visible.
   const [expandedSupplier, setExpandedSupplier] = useState<string | null>(null);
+  const [userToggled, setUserToggled] = useState(false);
+
+  useEffect(() => {
+    if (!userToggled && groupedOrders.length > 0) {
+      setExpandedSupplier(groupedOrders[0].supplierId);
+    }
+  }, [groupedOrders, userToggled]);
 
   if (isLoading) {
     return (
@@ -141,7 +148,7 @@ export function TodaysPickList({
           >
             {/* Clickable header — toggles item list */}
             <button
-              onClick={() => setExpandedSupplier(isExpanded ? null : group.supplierId)}
+              onClick={() => { setUserToggled(true); setExpandedSupplier(isExpanded ? null : group.supplierId); }}
               className={`w-full flex items-center justify-between px-5 py-4 text-left transition-colors ${
                 isComplete ? 'bg-green-50 hover:bg-green-100' : `${colors.bg} hover:brightness-95`
               }`}
