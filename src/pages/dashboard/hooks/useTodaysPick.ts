@@ -11,10 +11,10 @@ export interface GroupedOrders {
 }
 
 export function useTodaysPick(selectedDate: string) {
-  // Derive loading state from data source — avoids stale isLoading when
-  // OrderContext is still fetching.
+  // Wait for BOTH orders and suppliers before showing results — otherwise the
+  // supplier lookup fails and all items get filtered out while suppliers load.
   const { orders, isLoading: ordersLoading, error: ordersError } = useOrders();
-  const { suppliers } = useSuppliers();
+  const { suppliers, isLoading: suppliersLoading } = useSuppliers();
   const [groupedOrders, setGroupedOrders] = useState<GroupedOrders[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,7 +76,7 @@ export function useTodaysPick(selectedDate: string) {
 
   return {
     groupedOrders,
-    isLoading: ordersLoading,
+    isLoading: ordersLoading || suppliersLoading,
     error: ordersError || error,
   };
 }
